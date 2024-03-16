@@ -4,8 +4,9 @@ import { Stack } from 'expo-router';
 import * as MediaLibrary from 'expo-media-library';
 import { FlashList } from '@shopify/flash-list';
 import FolderCard from '../../components/FolderCard';
-import { getAlbums, insertAlbumInfo, insertFile } from '~/sqlite/sqlite.config';
+import { insertAlbumInfo, insertFile } from '~/sqlite/sqlite.config';
 import initDb from '../../utils/initDb';
+import { Text } from 'tamagui';
 
 export interface MediaAlbums {
   [key: string]: any[];
@@ -22,7 +23,6 @@ const requestPermissions = async () => {
 const fetchMedia = async () => {
   const albums = await MediaLibrary.getAlbumsAsync();
   const mediaByAlbum: { [key: string]: any[] } = {};
-  // console.log(albums); //album-> assetCount,title of album
   const db = await initDb();
 
   for (const album of albums) {
@@ -41,7 +41,7 @@ const fetchMedia = async () => {
 
 const FileSync = () => {
   const [mediaAlbums, setMediaAlbums] = useState<MediaAlbums>({});
-  
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     const getPermissionsAndFetchMedia = async () => {
       const permission: string = await requestPermissions();
@@ -50,8 +50,15 @@ const FileSync = () => {
         setMediaAlbums(mediaByAlbum);
       }
     };
-    getPermissionsAndFetchMedia();
+    getPermissionsAndFetchMedia().then(() => setLoading(false));
   }, []);
+
+  if (loading)
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );
 
   return (
     <ScrollView>

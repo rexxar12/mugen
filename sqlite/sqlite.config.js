@@ -76,23 +76,27 @@ export async function getAlbums(db) {
 }
 
 export async function getFiles(db, title) {
-  const query = `SELECT * FROM files limit 10`;
-  let files = await new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        query,
-        [title],
-        (_, { rows }) => {
-          console.log('rows', rows);
-          resolve(rows._array);
-        },
-        (_, error) => {
-          console.log('error', error);
-          reject(error);
-        }
-      );
+  const query = `SELECT * FROM files WHERE albumTitle = ?`;
+  try {
+    let files = await new Promise((resolve, reject) => {
+      db.readTransaction((tx) => {
+        tx.executeSql(
+          query,
+          [title],
+          (_, { rows }) => {
+            resolve(rows._array);
+          },
+          (_, error) => {
+            console.log('error', error);
+            reject(error);
+          }
+        );
+      });
     });
-  });
-  console.log('files', files);
-  return files;
+    console.log('files', files);
+    return files;
+  } catch (error) {
+    console.error('Error getting files:', error);
+    throw error;
+  }
 }

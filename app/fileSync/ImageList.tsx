@@ -3,8 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { Image } from 'tamagui';
 import * as MediaLibrary from 'expo-media-library';
-import initDb from '~/utils/initDb';
-import { getAlbums, getFiles } from '~/sqlite/sqlite.config';
 
 interface MediaItem {
   albumId: string;
@@ -20,10 +18,6 @@ interface MediaItem {
 }
 
 const fetchMedia = async (title: string) => {
-  const db = await initDb();
-  const files = await getFiles(db, title);
-  await getAlbums(db);
-  console.log(files);
   const album = await MediaLibrary.getAlbumAsync(title);
   const media = await MediaLibrary.getAssetsAsync({
     album: album,
@@ -31,6 +25,7 @@ const fetchMedia = async (title: string) => {
     mediaType: ['photo', 'video'],
   });
   const sortedAssets = media.assets.sort((a, b) => b.creationTime - a.creationTime);
+
   return sortedAssets;
 };
 
