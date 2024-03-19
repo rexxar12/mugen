@@ -23,17 +23,12 @@ const requestPermissions = async () => {
 const fetchMedia = async () => {
   const albums = await MediaLibrary.getAlbumsAsync();
   const mediaByAlbum: { [key: string]: any[] } = {};
-  const db = await initDb();
 
   for (const album of albums) {
-    await insertAlbumInfo(db, album.id, album.title, album.assetCount);
     const media = await MediaLibrary.getAssetsAsync({
       album: album,
       mediaType: ['photo', 'video'],
     });
-    for (const asset of media.assets) {
-      await insertFile(db, asset.id, asset.filename, album.id, album.title, asset.uri);
-    }
     if (media.assets.length > 0) mediaByAlbum[album.title] = media.assets;
   }
   return mediaByAlbum;
@@ -67,7 +62,8 @@ const FileSync = () => {
         <FlashList
           data={Object.keys(mediaAlbums)}
           numColumns={2}
-          estimatedItemSize={100 || 0}
+          showsVerticalScrollIndicator={false}
+          estimatedItemSize={210}
           renderItem={({ item }) => <FolderCard props={mediaAlbums[item]} title={item} />}
           keyExtractor={(item) => item}
         />

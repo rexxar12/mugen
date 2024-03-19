@@ -93,7 +93,58 @@ export async function getFiles(db, title) {
         );
       });
     });
-    console.log('files', files);
+    return files;
+  } catch (error) {
+    console.error('Error getting files:', error);
+    throw error;
+  }
+}
+
+export async function markForSync(db, fileIds) {
+  
+  const query = `UPDATE files SET flag = 1 WHERE fileId = ?`;
+  for(id of fileIds){
+    await db.transaction(
+      (tx) => {
+        tx.executeSql(
+          query,
+         [id],
+          (_, { rowsAffected }) => {
+            if (rowsAffected > 0) {
+              console.log(`Row with ID ${id} updated successfully`);
+            } else {
+              console.log(`Row with ID ${id} not found`);
+            }
+          },
+          (_, error) => {
+            console.error('Error updating row:', error);
+          }
+        );
+      },
+      null,
+      null
+    );
+  }
+}
+
+export async function getMarkedForSync(db, title) {
+  const query = `SELECT * FROM files WHERE albumTitle = ? AND flag = 1`;
+  try {
+    let files = await new Promise((resolve, reject) => {
+      db.readTransaction((tx) => {
+        tx.executeSql(
+          query,
+          [title],
+          (_, { rows }) => {
+            resolve(rows._array);
+          },
+          (_, error) => {
+            console.log('error', error);
+            reject(error);
+          }
+        );
+      });
+    });
     return files;
   } catch (error) {
     console.error('Error getting files:', error);
