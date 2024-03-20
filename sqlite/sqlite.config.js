@@ -104,27 +104,59 @@ export async function markForSync(db, fileIds) {
   console.log('fileIds', fileIds);
   const query = `UPDATE files SET flag = 1 WHERE fileId = ?`;
 
-  const promises = fileIds.map(id =>
-    new Promise((resolve, reject) => {
-      db.transaction(
-        tx => {
-          tx.executeSql(
-            query,
-            [id],
-            (_, { rowsAffected }) => {
-              console.log(id);
-              resolve();
-            },
-            (_, error) => {
-              console.error('Error updating row:', error);
-              reject(error);
-            }
-          );
-        },
-        null,
-        null
-      );
-    })
+  const promises = fileIds.map(
+    (id) =>
+      new Promise((resolve, reject) => {
+        db.transaction(
+          (tx) => {
+            tx.executeSql(
+              query,
+              [id],
+              (_, { rowsAffected }) => {
+                console.log(id);
+                resolve();
+              },
+              (_, error) => {
+                console.error('Error updating row:', error);
+                reject(error);
+              }
+            );
+          },
+          null,
+          null
+        );
+      })
+  );
+
+  await Promise.all(promises);
+}
+
+export async function unmarkSyncItem(db, fileIds) {
+  console.log('fileIds', fileIds);
+  const query = `UPDATE files SET flag = 0 WHERE fileId = ?`;
+
+  const promises = fileIds.map(
+    (id) =>
+      new Promise((resolve, reject) => {
+        db.transaction(
+          (tx) => {
+            tx.executeSql(
+              query,
+              [id],
+              (_, { rowsAffected }) => {
+                console.log(id);
+                resolve();
+              },
+              (_, error) => {
+                console.error('Error updating row:', error);
+                reject(error);
+              }
+            );
+          },
+          null,
+          null
+        );
+      })
   );
 
   await Promise.all(promises);

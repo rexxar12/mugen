@@ -4,8 +4,13 @@ import { Stack, useLocalSearchParams } from 'expo-router';
 import { Image, Text } from 'tamagui';
 import * as MediaLibrary from 'expo-media-library';
 import ImageView from 'react-native-image-viewing';
-import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
-import initDatabase, { getFiles, getMarkedForSync, markForSync } from '~/sqlite/sqlite.config';
+import { FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
+import initDatabase, {
+  getFiles,
+  getMarkedForSync,
+  markForSync,
+  unmarkSyncItem,
+} from '~/sqlite/sqlite.config';
 
 interface MediaItem {
   albumId: string;
@@ -85,7 +90,7 @@ export default function ImageList() {
     });
   }, [title, isSyncing]);
 
-  if (isLoading && !isSyncing)
+  if (isLoading)
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Loading...</Text>
@@ -99,18 +104,32 @@ export default function ImageList() {
           title: title,
           headerRight: () =>
             isSelectorActive && (
-              <TouchableOpacity
-                onPress={async () => {
-                  const db = await initDatabase();
-                  await markForSync(db, selectedItems).then(() => {
-                    setIsSyncing(true);
-                    setSelectedItems([]);
-                    console.log('Synced');
-                    setIsSelectorActive(false);
-                  });
-                }}>
-                <FontAwesome5 name="sync" size={16} />
-              </TouchableOpacity>
+              <View style={{ flexDirection: 'row', width: 70, justifyContent: 'space-between' }}>
+                <TouchableOpacity
+                  onPress={async () => {
+                    const db = await initDatabase();
+                    await unmarkSyncItem(db, selectedItems).then(() => {
+                      setIsSyncing(true);
+                      setSelectedItems([]);
+                      console.log('Synced');
+                      setIsSelectorActive(false);
+                    });
+                  }}>
+                  <FontAwesome6 name="xmark" size={20} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={async () => {
+                    const db = await initDatabase();
+                    await markForSync(db, selectedItems).then(() => {
+                      setIsSyncing(true);
+                      setSelectedItems([]);
+                      console.log('Synced');
+                      setIsSelectorActive(false);
+                    });
+                  }}>
+                  <FontAwesome5 name="sync" size={16} />
+                </TouchableOpacity>
+              </View>
             ),
         }}
       />
@@ -127,10 +146,11 @@ export default function ImageList() {
           <View style={{ marginHorizontal: 2, height: 120, width: '33%', marginVertical: 4 }}>
             {markedForSync.includes(item.id) && (
               <View style={{ position: 'absolute', flex: 1, zIndex: 999, right: 4, top: 4 }}>
-                <MaterialCommunityIcons name="flag" color="green" size={20} />
+                <MaterialCommunityIcons name="flag" color="white" size={20} />
               </View>
             )}
             <TouchableOpacity
+              activeOpacity={0.8}
               onPress={() => handlePress(item.id, index)}
               onLongPress={() => handleLongPress(item.id)}
               style={{
