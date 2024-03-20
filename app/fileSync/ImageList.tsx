@@ -52,7 +52,6 @@ export default function ImageList() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isSelectorActive, setIsSelectorActive] = useState(false);
   const [markedForSync, setMarkedForSync] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(true);
 
   const handleLongPress = (id: string) => {
@@ -89,13 +88,6 @@ export default function ImageList() {
       setIsSyncing(false);
     });
   }, [title, isSyncing]);
-
-  if (isLoading)
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Loading...</Text>
-      </View>
-    );
 
   return (
     <View style={{ flex: 1 }}>
