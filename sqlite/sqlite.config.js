@@ -101,34 +101,37 @@ export async function getFiles(db, title) {
 }
 
 export async function markForSync(db, fileIds) {
-  
+  console.log('fileIds', fileIds);
   const query = `UPDATE files SET flag = 1 WHERE fileId = ?`;
-  for(id of fileIds){
-    await db.transaction(
-      (tx) => {
-        tx.executeSql(
-          query,
-         [id],
-          (_, { rowsAffected }) => {
-            if (rowsAffected > 0) {
-              console.log(`Row with ID ${id} updated successfully`);
-            } else {
-              console.log(`Row with ID ${id} not found`);
+
+  const promises = fileIds.map(id =>
+    new Promise((resolve, reject) => {
+      db.transaction(
+        tx => {
+          tx.executeSql(
+            query,
+            [id],
+            (_, { rowsAffected }) => {
+              console.log(id);
+              resolve();
+            },
+            (_, error) => {
+              console.error('Error updating row:', error);
+              reject(error);
             }
-          },
-          (_, error) => {
-            console.error('Error updating row:', error);
-          }
-        );
-      },
-      null,
-      null
-    );
-  }
+          );
+        },
+        null,
+        null
+      );
+    })
+  );
+
+  await Promise.all(promises);
 }
 
 export async function getMarkedForSync(db, title) {
-  const query = `SELECT * FROM files WHERE albumTitle = ? AND flag = 1`;
+  const query = `SELECT fileId FROM files WHERE albumTitle = ? AND flag = 1`;
   try {
     let files = await new Promise((resolve, reject) => {
       db.readTransaction((tx) => {
@@ -136,7 +139,11 @@ export async function getMarkedForSync(db, title) {
           query,
           [title],
           (_, { rows }) => {
-            resolve(rows._array);
+            let fileIds = [];
+            for (let i = 0; i < rows.length; i++) {
+              fileIds.push(rows.item(i).fileId);
+            }
+            resolve(fileIds);
           },
           (_, error) => {
             console.log('error', error);

@@ -4,7 +4,7 @@ import { Stack } from 'expo-router';
 import * as MediaLibrary from 'expo-media-library';
 import { FlashList } from '@shopify/flash-list';
 import FolderCard from '../../components/FolderCard';
-import { insertAlbumInfo, insertFile } from '~/sqlite/sqlite.config';
+import initDatabase, { insertAlbumInfo, insertFile } from '~/sqlite/sqlite.config';
 import initDb from '../../utils/initDb';
 import { Text } from 'tamagui';
 
@@ -23,8 +23,10 @@ const requestPermissions = async () => {
 const fetchMedia = async () => {
   const albums = await MediaLibrary.getAlbumsAsync();
   const mediaByAlbum: { [key: string]: any[] } = {};
-
+  
+  const db = await initDatabase();
   for (const album of albums) {
+    await insertAlbumInfo(db, album.title, album.id, album.assetCount);
     const media = await MediaLibrary.getAssetsAsync({
       album: album,
       mediaType: ['photo', 'video'],

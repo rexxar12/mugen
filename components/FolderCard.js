@@ -4,10 +4,10 @@ import { FlashList } from '@shopify/flash-list';
 import { TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 
-export default function FolderCard({ props, title }) {
+export default function FolderCard({ props, title, albumLength }) {
   const [data, setData] = useState([]);
   const router = useRouter();
-
+  
   useEffect(() => {
     if (props) {
       const splicedData = [...props].splice(0, 4);
@@ -18,7 +18,7 @@ export default function FolderCard({ props, title }) {
     <TouchableOpacity
       style={{ flex: 1 }}
       onPress={() => {
-        router.push(`/fileSync/ImageList?title=${title}`);
+        router.push(`/fileSync/ImageList?title=${title}&albumLength=${albumLength}`);
       }}>
       <View margin={5} height={210} flex={1}>
         <FlashList
