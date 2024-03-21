@@ -4,10 +4,14 @@ import { FlashList } from '@shopify/flash-list';
 import { TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 
-export default function FolderCard({ props, title }) {
-  const [data, setData] = useState([]);
+interface FolderCardData {
+  uri: string;
+  name: string;
+}
+
+export default function FolderCard({ props, title }: { props: FolderCardData[], title: string }) {
+  const [data, setData] = useState<FolderCardData[]>([]); // Add type annotation for data state variable
   const router = useRouter();
-  
   useEffect(() => {
     if (props) {
       const splicedData = [...props].splice(0, 4);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, ScrollView } from 'react-native';
-import { Stack } from 'expo-router';
+import { Link, Stack } from 'expo-router';
 import * as MediaLibrary from 'expo-media-library';
 import { FlashList } from '@shopify/flash-list';
 import FolderCard from '../../components/FolderCard';
@@ -65,7 +65,9 @@ const FileSync = () => {
           headerRight: () => {
             return (
               <View>
-                <MaterialIcons name="qr-code-scanner" size={24} />
+                <Link href="/RetrieveRemoteIP/">
+                  <MaterialIcons name="qr-code-scanner" size={24} />
+                </Link>
               </View>
             );
           },
