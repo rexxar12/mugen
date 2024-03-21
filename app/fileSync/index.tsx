@@ -4,9 +4,9 @@ import { Stack } from 'expo-router';
 import * as MediaLibrary from 'expo-media-library';
 import { FlashList } from '@shopify/flash-list';
 import FolderCard from '../../components/FolderCard';
-import initDatabase, { insertAlbumInfo, insertFile } from '~/sqlite/sqlite.config';
-import initDb from '../../utils/initDb';
+import initDatabase, { insertAlbumInfo } from '~/sqlite/sqlite.config';
 import { Text } from 'tamagui';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export interface MediaAlbums {
   [key: string]: any[];
@@ -23,7 +23,7 @@ const requestPermissions = async () => {
 const fetchMedia = async () => {
   const albums = await MediaLibrary.getAlbumsAsync();
   const mediaByAlbum: { [key: string]: any[] } = {};
-  
+
   const db = await initDatabase();
   for (const album of albums) {
     await insertAlbumInfo(db, album.title, album.id, album.assetCount);
@@ -59,8 +59,19 @@ const FileSync = () => {
 
   return (
     <ScrollView>
-      <Stack.Screen options={{ title: 'FileSync' }} />
-      <View>
+      <Stack.Screen
+        options={{
+          title: 'FileSync',
+          headerRight: () => {
+            return (
+              <View>
+                <MaterialIcons name="qr-code-scanner" size={24} />
+              </View>
+            );
+          },
+        }}
+      />
+      <View style={{ flex: 1 }}>
         <FlashList
           data={Object.keys(mediaAlbums)}
           numColumns={2}
