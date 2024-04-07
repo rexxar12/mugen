@@ -2,10 +2,23 @@ import { View, Text, Button, Image } from 'tamagui';
 import React, { useEffect, useState } from 'react';
 import { CameraView, Camera } from 'expo-camera/next';
 import { Alert, StyleSheet } from 'react-native';
+import { useIPStore } from '~/state/ipStore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function QRScanner() {
   const [hasPermission, setHasPermission] = useState<boolean>(false);
   const [scanned, setScanned] = useState(false);
+  const ip = useIPStore((state) => state.ip);
+  const setIP = useIPStore((state) => state.setIP);
+
+  useEffect(() => {
+    if (ip) {
+      const storeEndpoint = async () => await AsyncStorage.setItem('endpoint', ip);
+      storeEndpoint().then(() => {
+        console.log('IP stored');
+      });
+    }
+  }, [ip]);
 
   useEffect(() => {
     const getCameraPermissions = async () => {
@@ -18,10 +31,7 @@ export default function QRScanner() {
 
   const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
     setScanned(true);
-    Alert.alert(`Bar code with type ${type} and data ${data} has been scanned!`, '', [
-      { text: 'OK', onPress: () => setScanned(false) },
-      { text: 'Cancel', onPress: () => setScanned(false) },
-    ]);
+    setIP(data);
   };
 
   if (hasPermission === null) {

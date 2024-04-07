@@ -7,7 +7,8 @@ import FolderCard from '../../components/FolderCard';
 import initDatabase, { insertAlbumInfo } from '~/sqlite/sqlite.config';
 import { Text } from 'tamagui';
 import { MaterialIcons } from '@expo/vector-icons';
-
+import initDb from '~/utils/initDb';
+import { RegisterBackgroundUpload } from '~/utils/backgroundServices';
 export interface MediaAlbums {
   [key: string]: any[];
 }
@@ -35,19 +36,23 @@ const fetchMedia = async () => {
   }
   return mediaByAlbum;
 };
-
+RegisterBackgroundUpload();
 const FileSync = () => {
   const [mediaAlbums, setMediaAlbums] = useState<MediaAlbums>({});
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const getPermissionsAndFetchMedia = async () => {
+      await initDb();
       const permission: string = await requestPermissions();
       if (permission === 'granted') {
         const mediaByAlbum = await fetchMedia();
         setMediaAlbums(mediaByAlbum);
       }
     };
-    getPermissionsAndFetchMedia().then(() => setLoading(false));
+    getPermissionsAndFetchMedia().then((res) => {
+      console.log(res);
+      setLoading(false);
+    });
   }, []);
 
   if (loading)
@@ -58,7 +63,7 @@ const FileSync = () => {
     );
 
   return (
-    <ScrollView>
+    <ScrollView showsVerticalScrollIndicator={false}>
       <Stack.Screen
         options={{
           title: 'FileSync',

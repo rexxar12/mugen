@@ -27,11 +27,33 @@ export async function createFilesTable(db) {
   });
 }
 
-export async function insertFile(db, fileId, fileName, albumId, albumTitle, uri) {
-  const query = `INSERT OR IGNORE INTO ${FILES} (fileId, fileName, albumId, albumTitle, uri, flag) VALUES (?, ?, ?, ?, ?, ?)`;
-  await db.transaction((tx) => {
-    tx.executeSql(query, [fileId, fileName, albumId, albumTitle, uri, 0]);
-  });
+export async function insertFiles(db, assets, albumTitle) {
+  const query = `INSERT OR IGNORE INTO files (fileId, fileName, albumId, albumTitle, uri, flag) VALUES (?, ?, ?, ?, ?, ?)`;
+
+  const promises = assets.map(
+    (asset) =>
+      new Promise((resolve, reject) => {
+        db.transaction(
+          (tx) => {
+            tx.executeSql(
+              query,
+              [asset.id, asset.filename, asset.albumId, albumTitle, asset.uri, 0],
+              (_, { rowsAffected }) => {
+                resolve();
+              },
+              (_, error) => {
+                console.error('Error inserting row:', error);
+                reject(error);
+              }
+            );
+          },
+          null,
+          null
+        );
+      })
+  );
+
+  await Promise.all(promises);
 }
 
 export async function createAlbumInfoTable(db) {
@@ -61,7 +83,6 @@ export async function getAlbums(db) {
         query,
         [],
         (_, { rows }) => {
-          console.log('rows', rows);
           resolve(rows._array);
         },
         (_, error) => {
@@ -71,7 +92,6 @@ export async function getAlbums(db) {
       );
     });
   });
-  console.log('albums', albums);
   return albums;
 }
 
@@ -101,7 +121,6 @@ export async function getFiles(db, title) {
 }
 
 export async function markForSync(db, fileIds) {
-  console.log('fileIds', fileIds);
   const query = `UPDATE files SET flag = 1 WHERE fileId = ?`;
 
   const promises = fileIds.map(
@@ -113,7 +132,6 @@ export async function markForSync(db, fileIds) {
               query,
               [id],
               (_, { rowsAffected }) => {
-                console.log(id);
                 resolve();
               },
               (_, error) => {
@@ -132,7 +150,6 @@ export async function markForSync(db, fileIds) {
 }
 
 export async function unmarkSyncItem(db, fileIds) {
-  console.log('fileIds', fileIds);
   const query = `UPDATE files SET flag = 0 WHERE fileId = ?`;
 
   const promises = fileIds.map(
@@ -144,7 +161,6 @@ export async function unmarkSyncItem(db, fileIds) {
               query,
               [id],
               (_, { rowsAffected }) => {
-                console.log(id);
                 resolve();
               },
               (_, error) => {
@@ -189,4 +205,58 @@ export async function getMarkedForSync(db, title) {
     console.error('Error getting files:', error);
     throw error;
   }
+}
+
+export async function getFilesToSync(db) {
+  const query = `SELECT * FROM files WHERE flag = 1`;
+  try {
+    let files = await new Promise((resolve, reject) => {
+      db.readTransaction((tx) => {
+        tx.executeSql(
+          query,
+          [],
+          (_, { rows }) => {
+            resolve(rows._array);
+          },
+          (_, error) => {
+            console.log('error', error);
+            reject(error);
+          }
+        );
+      });
+    });
+    return files;
+  } catch (error) {
+    console.error('Error getting files:', error);
+    throw error;
+  }
+}
+
+export async function updateFilesStatus(db, fileIds) {
+  const query = `UPDATE files SET flag = 2 WHERE id = ?`;
+
+  const promises = fileIds.map(
+    (id) =>
+      new Promise((resolve, reject) => {
+        db.transaction(
+          (tx) => {
+            tx.executeSql(
+              query,
+              [id],
+              (_, { rowsAffected }) => {
+                resolve();
+              },
+              (_, error) => {
+                console.error('Error updating row:', error);
+                reject(error);
+              }
+            );
+          },
+          null,
+          null
+        );
+      })
+  );
+
+  await Promise.all(promises);
 }

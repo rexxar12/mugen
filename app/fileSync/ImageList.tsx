@@ -6,8 +6,8 @@ import * as MediaLibrary from 'expo-media-library';
 import ImageView from 'react-native-image-viewing';
 import { FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import initDatabase, {
-  getFiles,
   getMarkedForSync,
+  insertFiles,
   markForSync,
   unmarkSyncItem,
 } from '~/sqlite/sqlite.config';
@@ -32,6 +32,8 @@ const fetchMedia = async (title: string) => {
     sortBy: MediaLibrary.SortBy.modificationTime,
     mediaType: ['photo', 'video'],
   });
+  const db = await initDatabase();
+  await insertFiles(db, media.assets, title);
   return media.assets;
 };
 
@@ -131,14 +133,16 @@ export default function ImageList() {
         visible={visible}
         onRequestClose={() => setIsVisible(false)}
       />
+
+      {/* Render image list */}
       <FlatList
         data={mediaItems}
         numColumns={3}
         renderItem={({ item, index }) => (
           <View style={{ marginHorizontal: 2, height: 120, width: '33%', marginVertical: 4 }}>
             {markedForSync.includes(item.id) && (
-              <View style={{ position: 'absolute', flex: 1, zIndex: 999, right: 4, top: 4 }}>
-                <MaterialCommunityIcons name="flag" color="white" size={20} />
+              <View style={{ position: 'absolute', flex: 1, zIndex: 1, right: 4, top: 4 }}>
+                <MaterialCommunityIcons name="flag" color="green" size={20} />
               </View>
             )}
             <TouchableOpacity

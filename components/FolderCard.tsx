@@ -18,39 +18,28 @@ export default function FolderCard({ props, title }: { props: FolderCardData[], 
       setData(splicedData);
     }
   }, []);
+
   return (
     <TouchableOpacity
       style={{ flex: 1 }}
       onPress={() => {
         router.push(`/fileSync/ImageList?title=${title}`);
       }}>
-      <View margin={5} height={210} flex={1}>
-        <FlashList
-          data={data}
-          numColumns={2}
-          estimatedItemSize={91}
-          renderItem={({ item, index }) => (
-            <View style={{ height: 90, width: '100%' }}>
-              <Image
-                src={item.uri}
-                style={{
-                  height: 88,
-                  borderTopLeftRadius: index === 0 ? 15 : 0,
-                  borderTopRightRadius: index === 1 ? 15 : 0,
-                  borderBottomLeftRadius: index === 2 ? 15 : 0,
-                  borderBottomRightRadius: index === 3 ? 15 : 0,
-                  marginHorizontal: 1,
-                }}
-                resizeMode="cover"
-              />
-              <Text>{item.name}</Text>
-            </View>
-          )}
-        />
-        <H6 color={'black'} numberOfLines={1}>
-          {title}
-        </H6>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          height: 200,
+          borderWidth: 1,
+        }}>
+        {data && data.length > 0 && (
+          <Image source={{ uri: data[0].uri }} style={{ width: '100%', height: '100%' }} />
+        )}
       </View>
+      <H6 color={'black'} numberOfLines={1}>
+        {title}
+      </H6>
     </TouchableOpacity>
   );
 }
