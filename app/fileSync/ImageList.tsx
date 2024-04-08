@@ -6,9 +6,9 @@ import * as MediaLibrary from 'expo-media-library';
 import ImageView from 'react-native-image-viewing';
 import { FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import initDatabase, {
+  getFiles,
   getMarkedForSync,
   insertFiles,
-  markForSync,
   unmarkSyncItem,
 } from '~/sqlite/sqlite.config';
 
@@ -26,15 +26,13 @@ interface MediaItem {
 }
 
 const fetchMedia = async (title: string) => {
-  console.log('Fetching media for:', title);
   const album = await MediaLibrary.getAlbumAsync(title);
   const media = await MediaLibrary.getAssetsAsync({
     album: album,
     sortBy: MediaLibrary.SortBy.modificationTime,
     mediaType: ['photo', 'video'],
+    first: 50,
   });
-  const db = await initDatabase();
-  await insertFiles(db, media.assets, title);
   return media.assets;
 };
 
@@ -49,7 +47,7 @@ export default function ImageList() {
   const title = searchParams.title as string;
 
   const [mediaItems, setMediaItems] = useState<any[]>([]);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [imageUri, setImageUri] = useState<any[]>([]);
   const [visible, setIsVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -57,26 +55,27 @@ export default function ImageList() {
   const [markedForSync, setMarkedForSync] = useState<string[]>([]);
   const [isSyncing, setIsSyncing] = useState(true);
 
-  const handleLongPress = (id: string) => {
+  const handleLongPress = (index: number) => {
     setIsSelectorActive(true);
     setSelectedItems((prevSelectedItems) => {
-      if (prevSelectedItems.includes(id)) {
+      if (prevSelectedItems.includes(index)) {
         prevSelectedItems.length === 1 && setIsSelectorActive(false);
-        return prevSelectedItems.filter((item) => item !== id);
+        return prevSelectedItems.filter((item) => item !== index);
       } else {
-        return [...prevSelectedItems, id];
+        return [...prevSelectedItems, index];
       }
     });
   };
 
-  const handlePress = (id: string, index: number) => {
+  const handlePress = (index: number) => {
     if (isSelectorActive) {
-      handleLongPress(id);
+      handleLongPress(index);
     } else {
       setIsVisible(true);
       setSelectedIndex(index);
     }
   };
+
   useEffect(() => {
     fetchMedia(title as string).then((media) => {
       setMediaItems(media);
@@ -91,7 +90,7 @@ export default function ImageList() {
       setIsSyncing(false);
     });
   }, [title, isSyncing]);
-
+  console.log('Marked for sync:', markedForSync);
   return (
     <View style={{ flex: 1 }}>
       <Stack.Screen
@@ -114,11 +113,12 @@ export default function ImageList() {
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={async () => {
+                    const files = mediaItems.filter((item, index) => selectedItems.includes(index));
                     const db = await initDatabase();
-                    await markForSync(db, selectedItems).then(() => {
+                    await insertFiles(db, files, title).then(() => {
                       setIsSyncing(true);
                       setSelectedItems([]);
-                      console.log('Synced');
+                      console.log('Files set');
                       setIsSelectorActive(false);
                     });
                   }}>
@@ -143,15 +143,15 @@ export default function ImageList() {
           <View style={{ marginHorizontal: 2, height: 120, width: '33%', marginVertical: 4 }}>
             {markedForSync.includes(item.id) && (
               <View style={{ position: 'absolute', flex: 1, zIndex: 1, right: 4, top: 4 }}>
-                <MaterialCommunityIcons name="flag" color="green" size={20} />
+                <MaterialCommunityIcons name="flag" color="red" size={20} />
               </View>
             )}
             <TouchableOpacity
               activeOpacity={0.8}
-              onPress={() => handlePress(item.id, index)}
-              onLongPress={() => handleLongPress(item.id)}
+              onPress={() => handlePress(index)}
+              onLongPress={() => handleLongPress(index)}
               style={{
-                borderWidth: selectedItems.includes(item.id) ? 2 : 0,
+                borderWidth: selectedItems.includes(index) ? 2 : 0,
                 borderColor: 'blue',
                 width: '100%',
                 height: 120,

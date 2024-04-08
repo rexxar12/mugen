@@ -23,18 +23,13 @@ export const handleUpload = async () => {
     console.log('No files to upload');
     return;
   }
-  console.log('Files to upload:', files);
-  let start = 0;
-  let end = 10;
 
-  while (start <= files.length) {
-    const batch = files.slice(start, end);
-    await uploadFilesBatch(batch).then(async (res) => {
-      await updateFilesStatus(db, res);
-    });
-    start = end;
-    end += 10;
-  }
+  await uploadFilesBatch(files).then(async (fileIdArray) => {
+    if (fileIdArray) {
+      await updateFilesStatus(db, fileIdArray);
+      console.log('Files uploaded successfully');
+    }
+  });
 };
 
 TaskManager.defineTask(BACKGROUND_UPLOAD, handleUpload);

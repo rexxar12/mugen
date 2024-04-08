@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, ScrollView, Touchable, TouchableOpacity } from 'react-native';
+import { View, ScrollView, TouchableOpacity, FlatList } from 'react-native';
 import { Link, Stack } from 'expo-router';
 import * as MediaLibrary from 'expo-media-library';
-import { FlashList } from '@shopify/flash-list';
 import FolderCard from '../../components/FolderCard';
-import initDatabase, { insertAlbumInfo } from '~/sqlite/sqlite.config';
+import { insertAlbumInfo } from '~/sqlite/sqlite.config';
 import { Text } from 'tamagui';
 import { MaterialIcons } from '@expo/vector-icons';
 import initDb from '~/utils/initDb';
@@ -24,10 +23,13 @@ const requestPermissions = async () => {
 const fetchMedia = async () => {
   const albums = await MediaLibrary.getAlbumsAsync();
   const mediaByAlbum: { [key: string]: any[] } = {};
+  const db = await initDb();
+  await insertAlbumInfo(db, albums);
   for (const album of albums) {
     const media = await MediaLibrary.getAssetsAsync({
       album: album,
       mediaType: ['photo', 'video'],
+      first: 1, // Fetch only the first image or video from each album
     });
     if (media.assets.length > 0) mediaByAlbum[album.title] = media.assets;
   }
@@ -39,7 +41,6 @@ const FileSync = () => {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const getPermissionsAndFetchMedia = async () => {
-      await initDb();
       const permission: string = await requestPermissions();
       if (permission === 'granted') {
         const mediaByAlbum = await fetchMedia();
@@ -82,11 +83,10 @@ const FileSync = () => {
         }}
       />
       <View style={{ flex: 1 }}>
-        <FlashList
+        <FlatList
           data={Object.keys(mediaAlbums)}
           numColumns={2}
           showsVerticalScrollIndicator={false}
-          estimatedItemSize={210}
           renderItem={({ item }) => <FolderCard props={mediaAlbums[item]} title={item} />}
           keyExtractor={(item) => item}
         />

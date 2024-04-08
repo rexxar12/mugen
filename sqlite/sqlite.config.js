@@ -39,7 +39,7 @@ export async function insertFiles(db, assets, albumTitle) {
               query,
               [asset.id, asset.filename, asset.albumId, albumTitle, asset.uri, 1],
               (_, { rowsAffected }) => {
-                resolve();
+                resolve(rowsAffected);
               },
               (_, error) => {
                 console.error('Error inserting row:', error);
@@ -53,7 +53,7 @@ export async function insertFiles(db, assets, albumTitle) {
       })
   );
 
-  await Promise.all(promises);
+  await Promise.all(promises)
 }
 
 export async function createAlbumInfoTable(db) {
@@ -68,11 +68,13 @@ export async function createAlbumInfoTable(db) {
   });
 }
 
-export async function insertAlbumInfo(db, albumTitle, albumId, albumSize) {
+export async function insertAlbumInfo(db, albums) {
   const query = `INSERT OR REPLACE INTO ${ALBUM_INFO} (albumTitle, albumId, albumSize) VALUES (?, ?, ?)`;
   await db.transaction((tx) => {
-    tx.executeSql(query, [albumTitle, albumId, albumSize]);
-  });
+    for (const album of albums) {
+      tx.executeSql(query, [album.title, album.id, album.assetCount]);
+    }
+  })
 }
 
 export async function getAlbums(db) {
@@ -179,7 +181,7 @@ export async function unmarkSyncItem(db, fileIds) {
 }
 
 export async function getMarkedForSync(db, title) {
-  const query = `SELECT fileId FROM files WHERE albumTitle = ? AND flag = 1 OR flag = 2`;
+  const query = `SELECT fileId,flag FROM files WHERE albumTitle = ? AND flag = 1 OR flag = 2`;
   try {
     let files = await new Promise((resolve, reject) => {
       db.readTransaction((tx) => {
@@ -189,7 +191,7 @@ export async function getMarkedForSync(db, title) {
           (_, { rows }) => {
             let fileIds = [];
             for (let i = 0; i < rows.length; i++) {
-              fileIds.push(rows.item(i).fileId);
+              fileIds.push({id: rows.item(i).fileId, flag: rows.item(i).flag});
             }
             resolve(fileIds);
           },
@@ -209,14 +211,13 @@ export async function getMarkedForSync(db, title) {
 
 export async function getFilesToSync(db) {
   try {
-    const query = `SELECT * FROM files WHERE flag = 1 limit 15`;
+    const query = `SELECT * FROM files WHERE flag = 1 limit 10`;
     return await new Promise((resolve, reject) => {
       db.readTransaction((tx) => {
         tx.executeSql(
           query,
           [],
           (_, { rows }) => {
-            
             resolve(rows._array);
           },
           (_, error) => {
@@ -226,7 +227,6 @@ export async function getFilesToSync(db) {
         );
       });
     });
-
   } catch (error) {
     console.error('Error getting files:', error);
     throw error;
