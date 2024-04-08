@@ -6,7 +6,6 @@ import * as MediaLibrary from 'expo-media-library';
 import ImageView from 'react-native-image-viewing';
 import { FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import initDatabase, {
-  getFiles,
   getMarkedForSync,
   insertFiles,
   unmarkSyncItem,
@@ -24,6 +23,11 @@ interface MediaItem {
   uri: string;
   width: number;
 }
+
+type MarkedItem = {
+  id: string;
+  flag: number;
+};
 
 const fetchMedia = async (title: string) => {
   const album = await MediaLibrary.getAlbumAsync(title);
@@ -52,7 +56,7 @@ export default function ImageList() {
   const [visible, setIsVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isSelectorActive, setIsSelectorActive] = useState(false);
-  const [markedForSync, setMarkedForSync] = useState<string[]>([]);
+  const [markedForSync, setMarkedForSync] = useState<MarkedItem[]>([]);
   const [isSyncing, setIsSyncing] = useState(true);
 
   const handleLongPress = (index: number) => {
@@ -142,10 +146,10 @@ export default function ImageList() {
           const markedItem = markedForSync.find((marked) => marked.id === item.id);
           let flagComponent = null;
           if (markedItem) {
-            const flagColor = markedItem.flag === 2 ? 'green' : 'red';
+            const iconName = markedItem.flag === 2 ? 'cloud-check-outline' : 'cloud-off-outline';
             flagComponent = (
               <View style={{ position: 'absolute', flex: 1, zIndex: 1, right: 4, top: 4 }}>
-                <MaterialCommunityIcons name="flag" color={flagColor} size={20} />
+                <MaterialCommunityIcons name={iconName} size={20} />
               </View>
             );
           }
