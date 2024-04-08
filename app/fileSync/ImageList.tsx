@@ -148,8 +148,8 @@ export default function ImageList() {
           if (markedItem) {
             const iconName = markedItem.flag === 2 ? 'cloud-check-outline' : 'cloud-off-outline';
             flagComponent = (
-              <View style={{ position: 'absolute', flex: 1, zIndex: 1, right: 4, top: 4 }}>
-                <MaterialCommunityIcons name={iconName} size={20} />
+              <View style={{ position: 'absolute', flex: 1, zIndex: 1, right: 4, bottom: 4 }}>
+                <MaterialCommunityIcons name={iconName} size={20} color="white"/>
               </View>
             );
           }

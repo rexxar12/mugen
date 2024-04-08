@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import { TouchableOpacity, FlatList } from 'react-native';
 import { Link, Stack } from 'expo-router';
 import * as MediaLibrary from 'expo-media-library';
 import FolderCard from '../../components/FolderCard';
 import { insertAlbumInfo } from '~/sqlite/sqlite.config';
-import { Text } from 'tamagui';
+import { View, Text } from 'tamagui';
 import { MaterialIcons } from '@expo/vector-icons';
 import initDb from '~/utils/initDb';
 import { RegisterBackgroundUpload, handleUpload } from '~/utils/backgroundServices';
@@ -64,7 +64,7 @@ const FileSync = () => {
     );
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
+    <View flex={1}>
       <Stack.Screen
         options={{
           title: 'FileSync',
@@ -91,7 +91,7 @@ const FileSync = () => {
           keyExtractor={(item) => item}
         />
       </View>
-    </ScrollView>
+    </View>
   );
 };
 

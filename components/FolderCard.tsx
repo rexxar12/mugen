@@ -9,13 +9,12 @@ interface FolderCardData {
   name: string;
 }
 
-export default function FolderCard({ props, title }: { props: FolderCardData[], title: string }) {
+export default function FolderCard({ props, title }: { props: FolderCardData[]; title: string }) {
   const [data, setData] = useState<FolderCardData[]>([]); // Add type annotation for data state variable
   const router = useRouter();
   useEffect(() => {
     if (props) {
-      const splicedData = [...props].splice(0, 4);
-      setData(splicedData);
+      setData([...props]);
     }
   }, []);
 
@@ -23,23 +22,27 @@ export default function FolderCard({ props, title }: { props: FolderCardData[], 
     <TouchableOpacity
       style={{ flex: 1 }}
       onPress={() => {
+        //@ts-ignore
         router.push(`/fileSync/ImageList?title=${title}`);
       }}>
       <View
         style={{
           flex: 1,
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          height: 200,
-          borderWidth: 1,
+          height: 160,
+          borderRadius: 16,
+          marginHorizontal: 8,
+          marginBottom: 40,
         }}>
         {data && data.length > 0 && (
-          <Image source={{ uri: data[0].uri }} style={{ width: '100%', height: '100%' }} />
+          <Image
+            source={{ uri: data[0].uri }}
+            style={{ width: '100%', height: '100%', borderRadius: 16 }}
+          />
         )}
+        <Text color={'black'} numberOfLines={1} mt={4}>
+          {title}
+        </Text>
       </View>
-      <H6 color={'black'} numberOfLines={1}>
-        {title}
-      </H6>
     </TouchableOpacity>
   );
 }
