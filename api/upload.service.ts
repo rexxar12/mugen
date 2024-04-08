@@ -12,7 +12,7 @@ interface Files {
 
 export const uploadFilesBatch = async (files: Files[]) => {
   const endpoint: string | null = await AsyncStorage.getItem('endpoint');
-
+  console.log('endpoint',endpoint)
   if (!endpoint) return;
 
   const formData = new FormData();
@@ -28,9 +28,9 @@ export const uploadFilesBatch = async (files: Files[]) => {
       type: 'application/octet-stream', // Adjust content type based on file type
     });
   }
-
+ 
   try {
-    const response = await fetch(endpoint, {
+    const response = await fetch(`${endpoint}/upload`, {
       method: 'POST',
       body: formData,
       headers: {

@@ -37,7 +37,7 @@ export async function insertFiles(db, assets, albumTitle) {
           (tx) => {
             tx.executeSql(
               query,
-              [asset.id, asset.filename, asset.albumId, albumTitle, asset.uri, 0],
+              [asset.id, asset.filename, asset.albumId, albumTitle, asset.uri, 1],
               (_, { rowsAffected }) => {
                 resolve();
               },
@@ -179,7 +179,7 @@ export async function unmarkSyncItem(db, fileIds) {
 }
 
 export async function getMarkedForSync(db, title) {
-  const query = `SELECT fileId FROM files WHERE albumTitle = ? AND flag = 1`;
+  const query = `SELECT fileId FROM files WHERE albumTitle = ? AND flag = 1 OR flag = 2`;
   try {
     let files = await new Promise((resolve, reject) => {
       db.readTransaction((tx) => {
@@ -208,14 +208,15 @@ export async function getMarkedForSync(db, title) {
 }
 
 export async function getFilesToSync(db) {
-  const query = `SELECT * FROM files WHERE flag = 1`;
   try {
-    let files = await new Promise((resolve, reject) => {
+    const query = `SELECT * FROM files WHERE flag = 1 limit 15`;
+    return await new Promise((resolve, reject) => {
       db.readTransaction((tx) => {
         tx.executeSql(
           query,
           [],
           (_, { rows }) => {
+            
             resolve(rows._array);
           },
           (_, error) => {
@@ -225,7 +226,7 @@ export async function getFilesToSync(db) {
         );
       });
     });
-    return files;
+
   } catch (error) {
     console.error('Error getting files:', error);
     throw error;

@@ -26,6 +26,7 @@ interface MediaItem {
 }
 
 const fetchMedia = async (title: string) => {
+  console.log('Fetching media for:', title);
   const album = await MediaLibrary.getAlbumAsync(title);
   const media = await MediaLibrary.getAssetsAsync({
     album: album,

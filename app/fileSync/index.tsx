@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, ScrollView } from 'react-native';
+import { View, ScrollView, Touchable, TouchableOpacity } from 'react-native';
 import { Link, Stack } from 'expo-router';
 import * as MediaLibrary from 'expo-media-library';
 import { FlashList } from '@shopify/flash-list';
@@ -8,7 +8,7 @@ import initDatabase, { insertAlbumInfo } from '~/sqlite/sqlite.config';
 import { Text } from 'tamagui';
 import { MaterialIcons } from '@expo/vector-icons';
 import initDb from '~/utils/initDb';
-import { RegisterBackgroundUpload } from '~/utils/backgroundServices';
+import { RegisterBackgroundUpload, handleUpload } from '~/utils/backgroundServices';
 export interface MediaAlbums {
   [key: string]: any[];
 }
@@ -24,10 +24,7 @@ const requestPermissions = async () => {
 const fetchMedia = async () => {
   const albums = await MediaLibrary.getAlbumsAsync();
   const mediaByAlbum: { [key: string]: any[] } = {};
-
-  const db = await initDatabase();
   for (const album of albums) {
-    await insertAlbumInfo(db, album.title, album.id, album.assetCount);
     const media = await MediaLibrary.getAssetsAsync({
       album: album,
       mediaType: ['photo', 'video'],
@@ -36,8 +33,8 @@ const fetchMedia = async () => {
   }
   return mediaByAlbum;
 };
-RegisterBackgroundUpload();
 const FileSync = () => {
+  RegisterBackgroundUpload();
   const [mediaAlbums, setMediaAlbums] = useState<MediaAlbums>({});
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -49,11 +46,14 @@ const FileSync = () => {
         setMediaAlbums(mediaByAlbum);
       }
     };
-    getPermissionsAndFetchMedia().then((res) => {
-      console.log(res);
-      setLoading(false);
-    });
-  }, []);
+    getPermissionsAndFetchMedia()
+      .catch((error) => {
+        console.error('Error fetching media:', error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [loading]);
 
   if (loading)
     return (
@@ -69,10 +69,13 @@ const FileSync = () => {
           title: 'FileSync',
           headerRight: () => {
             return (
-              <View>
-                <Link href="/RetrieveRemoteIP/">
+              <View style={{ flexDirection: 'row' }}>
+                <Link href="/RetrieveRemoteIP/" style={{ marginRight: 20 }}>
                   <MaterialIcons name="qr-code-scanner" size={24} />
                 </Link>
+                <TouchableOpacity onPress={async () => await handleUpload()}>
+                  <MaterialIcons name="refresh" size={24} />
+                </TouchableOpacity>
               </View>
             );
           },
