@@ -28,7 +28,7 @@ export async function createFilesTable(db) {
 }
 
 export async function insertFiles(db, assets, albumTitle) {
-  const query = `INSERT OR IGNORE INTO files (fileId, fileName, albumId, albumTitle, uri, flag) VALUES (?, ?, ?, ?, ?, ?)`;
+  const query = `INSERT OR REPLACE INTO files (fileId, fileName, albumId, albumTitle, uri, flag) VALUES (?, ?, ?, ?, ?, ?)`;
 
   const promises = assets.map(
     (asset) =>

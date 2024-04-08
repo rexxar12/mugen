@@ -90,7 +90,6 @@ export default function ImageList() {
       setIsSyncing(false);
     });
   }, [title, isSyncing]);
-  console.log('Marked for sync:', markedForSync);
   return (
     <View style={{ flex: 1 }}>
       <Stack.Screen
@@ -139,32 +138,40 @@ export default function ImageList() {
       <FlatList
         data={mediaItems}
         numColumns={3}
-        renderItem={({ item, index }) => (
-          <View style={{ marginHorizontal: 2, height: 120, width: '33%', marginVertical: 4 }}>
-            {markedForSync.includes(item.id) && (
+        renderItem={({ item, index }) => {
+          const markedItem = markedForSync.find((marked) => marked.id === item.id);
+          let flagComponent = null;
+          if (markedItem) {
+            const flagColor = markedItem.flag === 2 ? 'green' : 'red';
+            flagComponent = (
               <View style={{ position: 'absolute', flex: 1, zIndex: 1, right: 4, top: 4 }}>
-                <MaterialCommunityIcons name="flag" color="red" size={20} />
+                <MaterialCommunityIcons name="flag" color={flagColor} size={20} />
               </View>
-            )}
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => handlePress(index)}
-              onLongPress={() => handleLongPress(index)}
-              style={{
-                borderWidth: selectedItems.includes(index) ? 2 : 0,
-                borderColor: 'blue',
-                width: '100%',
-                height: 120,
-                margin: 1,
-              }}>
-              <Image
-                source={{ uri: item.uri }}
-                style={{ width: '100%', height: '100%' }}
-                resizeMode="cover"
-              />
-            </TouchableOpacity>
-          </View>
-        )}
+            );
+          }
+          return (
+            <View style={{ marginHorizontal: 2, height: 120, width: '33%', marginVertical: 4 }}>
+              {flagComponent}
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => handlePress(index)}
+                onLongPress={() => handleLongPress(index)}
+                style={{
+                  borderWidth: selectedItems.includes(index) ? 2 : 0,
+                  borderColor: 'blue',
+                  width: '100%',
+                  height: 120,
+                  margin: 1,
+                }}>
+                <Image
+                  source={{ uri: item.uri }}
+                  style={{ width: '100%', height: '100%' }}
+                  resizeMode="cover"
+                />
+              </TouchableOpacity>
+            </View>
+          );
+        }}
         keyExtractor={(item: MediaItem) => item.id}
       />
     </View>
