@@ -1,7 +1,8 @@
-import { View, Text } from 'react-native';
+import { View, Text, TextInput } from 'react-native';
 import React from 'react';
 import { Stack } from 'expo-router';
 import QRScanner from '~/components/QRScanner';
+import { Input } from '~/components/ui/input';
 
 export default function GetIP() {
   return (
@@ -11,10 +12,10 @@ export default function GetIP() {
           title: 'Get IP Address',
         }}
       />
-
-      <Text>IP Address</Text>
-      {/* <Input placeholder="Enter IP Address" flex={1} /> */}
-
+      <View style={{flexDirection:'row'}}>
+        <Text>IP Address</Text>
+        <Input placeholder="Enter IP Address" />
+      </View>
       <QRScanner />
     </View>
   );
