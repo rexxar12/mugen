@@ -1,7 +1,6 @@
-import { View, Text, Button, Image } from 'tamagui';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { CameraView, Camera } from 'expo-camera/next';
-import { Alert, StyleSheet } from 'react-native';
 import { useIPStore } from '~/state/ipStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

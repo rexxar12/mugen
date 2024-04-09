@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { TouchableOpacity, FlatList } from 'react-native';
+import { TouchableOpacity, FlatList, View, Text } from 'react-native';
 import { Link, Stack } from 'expo-router';
 import * as MediaLibrary from 'expo-media-library';
 import FolderCard from '../../components/FolderCard';
 import { insertAlbumInfo } from '~/sqlite/sqlite.config';
-import { View, Text } from 'tamagui';
 import { MaterialIcons } from '@expo/vector-icons';
 import initDb from '~/utils/initDb';
 import { RegisterBackgroundUpload, handleUpload } from '~/utils/backgroundServices';
+
 export interface MediaAlbums {
-  [key: string]: any[];
+  [key: string]: { assets: any[]; total: number };
 }
 
 const requestPermissions = async () => {
@@ -22,7 +22,7 @@ const requestPermissions = async () => {
 
 const fetchMedia = async () => {
   const albums = await MediaLibrary.getAlbumsAsync();
-  const mediaByAlbum: { [key: string]: any[] } = {};
+  const mediaByAlbum: MediaAlbums = {}; // Explicitly define the type of mediaByAlbum
   const db = await initDb();
   await insertAlbumInfo(db, albums);
   for (const album of albums) {
@@ -31,13 +31,13 @@ const fetchMedia = async () => {
       mediaType: ['photo', 'video'],
       first: 1, // Fetch only the first image or video from each album
     });
-    if (media.assets.length > 0) mediaByAlbum[album.title] = { assets: media.assets, total: album.assetCount };
+    if (media.assets.length > 0)
+      mediaByAlbum[album.title] = { assets: media.assets, total: album.assetCount };
   }
   return mediaByAlbum;
 };
 
 const FileSync = () => {
-
   const [mediaAlbums, setMediaAlbums] = useState<MediaAlbums>({});
   const [loading, setLoading] = useState(true);
 
@@ -67,7 +67,7 @@ const FileSync = () => {
     );
 
   return (
-    <View flex={1}>
+    <View style={{ flex: 1 }}>
       <Stack.Screen
         options={{
           title: 'FileSync',
@@ -85,12 +85,14 @@ const FileSync = () => {
           },
         }}
       />
-      <View flex={1} mt={12}>
+      <View style={{ flex: 1, marginTop: 12 }}>
         <FlatList
           data={Object.keys(mediaAlbums)}
           numColumns={1}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item, index }) => <FolderCard props={mediaAlbums[item]} title={item} index={index}/>}
+          renderItem={({ item, index }) => (
+            <FolderCard props={mediaAlbums[item]} title={item} index={index} />
+          )}
           keyExtractor={(item) => item}
         />
       </View>

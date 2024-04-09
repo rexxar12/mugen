@@ -21,7 +21,7 @@ export const uploadFilesBatch = async (files: Files[]) => {
   for (const file of files) {
     const filename = file.fileName; // Extract filename from URI
     fileIdArray.push(file.id);
-    // @ts-nocheck
+    // @ts-ignore
     formData.append('files', {
       uri: file.uri,
       name: filename,

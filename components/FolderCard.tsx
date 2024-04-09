@@ -1,6 +1,5 @@
-import { View, Image, H6, Text } from 'tamagui';
 import React, { useEffect, useState } from 'react';
-import { ImageBackground, TouchableOpacity } from 'react-native';
+import { ImageBackground, TouchableOpacity, View, Text } from 'react-native';
 import { useRouter } from 'expo-router';
 
 type File = {
@@ -72,15 +71,15 @@ export default function FolderCard({
                 width: '100%',
                 position: 'absolute',
                 backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                ...borders
+                ...borders,
               }}></View>
           </ImageBackground>
         )}
         <View style={{ position: 'absolute', bottom: 24, left: 20 }}>
-          <H6 color={'white'} numberOfLines={2} fontWeight={'700'}>
+          <Text style={{ color: 'white', fontWeight: '700' }} numberOfLines={2}>
             {title}
-          </H6>
-          <Text color={'white'}>{props.total} items</Text>
+          </Text>
+          <Text style={{ color: 'white' }}>{props.total} items</Text>
         </View>
       </View>
     </TouchableOpacity>

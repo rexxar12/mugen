@@ -1,7 +1,6 @@
-import { View, TouchableOpacity, FlatList } from 'react-native';
+import { View, TouchableOpacity, FlatList, Image } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import { Image, Text } from 'tamagui';
 import * as MediaLibrary from 'expo-media-library';
 import ImageView from 'react-native-image-viewing';
 import { FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -149,7 +148,7 @@ export default function ImageList() {
             const iconName = markedItem.flag === 2 ? 'cloud-check-outline' : 'cloud-off-outline';
             flagComponent = (
               <View style={{ position: 'absolute', flex: 1, zIndex: 1, right: 4, bottom: 4 }}>
-                <MaterialCommunityIcons name={iconName} size={20} color="white"/>
+                <MaterialCommunityIcons name={iconName} size={20} color="white" />
               </View>
             );
           }
