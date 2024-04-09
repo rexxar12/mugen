@@ -31,14 +31,16 @@ const fetchMedia = async () => {
       mediaType: ['photo', 'video'],
       first: 1, // Fetch only the first image or video from each album
     });
-    if (media.assets.length > 0) mediaByAlbum[album.title] = media.assets;
+    if (media.assets.length > 0) mediaByAlbum[album.title] = { assets: media.assets, total: album.assetCount };
   }
   return mediaByAlbum;
 };
+
 const FileSync = () => {
-  RegisterBackgroundUpload();
+
   const [mediaAlbums, setMediaAlbums] = useState<MediaAlbums>({});
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const getPermissionsAndFetchMedia = async () => {
       const permission: string = await requestPermissions();
@@ -53,8 +55,9 @@ const FileSync = () => {
       })
       .finally(() => {
         setLoading(false);
+        RegisterBackgroundUpload();
       });
-  }, [loading]);
+  }, []);
 
   if (loading)
     return (
@@ -82,12 +85,12 @@ const FileSync = () => {
           },
         }}
       />
-      <View style={{ flex: 1 }}>
+      <View flex={1} mt={12}>
         <FlatList
           data={Object.keys(mediaAlbums)}
-          numColumns={2}
+          numColumns={1}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => <FolderCard props={mediaAlbums[item]} title={item} />}
+          renderItem={({ item, index }) => <FolderCard props={mediaAlbums[item]} title={item} index={index}/>}
           keyExtractor={(item) => item}
         />
       </View>

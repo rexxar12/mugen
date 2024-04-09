@@ -41,6 +41,10 @@ const config = createTamagui({
   fonts: { body: bodyFont, heading: headingFont },
   media: createMedia({
     xs: { maxWidth: 660 },
+    sm: { minWidth: 661, maxWidth: 960 },
+    md: { minWidth: 961, maxWidth: 1280 },
+    lg: { minWidth: 1281, maxWidth: 1920 },
+    xl: { minWidth: 1921 },
     // ...
   }),
 });

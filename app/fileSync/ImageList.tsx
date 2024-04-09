@@ -35,7 +35,7 @@ const fetchMedia = async (title: string) => {
     album: album,
     sortBy: MediaLibrary.SortBy.modificationTime,
     mediaType: ['photo', 'video'],
-    first: 50,
+    first: 400,
   });
   return media.assets;
 };

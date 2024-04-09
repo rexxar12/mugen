@@ -1,22 +1,50 @@
-import { View, Text, Image, YStack, XStack, Heading, H6 } from 'tamagui';
+import { View, Image, H6, Text } from 'tamagui';
 import React, { useEffect, useState } from 'react';
-import { FlashList } from '@shopify/flash-list';
-import { TouchableOpacity } from 'react-native';
+import { ImageBackground, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 
-interface FolderCardData {
+type File = {
+  albumId: string;
+  creationTime: number;
+  duration: number;
+  filename: string;
+  height: number;
+  id: string;
+  mediaType: string;
+  modificationTime: number;
   uri: string;
-  name: string;
+  width: number;
+};
+
+interface FolderCardData {
+  assets: File[];
+  total: number;
 }
 
-export default function FolderCard({ props, title }: { props: FolderCardData[]; title: string }) {
-  const [data, setData] = useState<FolderCardData[]>([]); // Add type annotation for data state variable
+export default function FolderCard({
+  props,
+  title,
+  index,
+}: {
+  props: FolderCardData;
+  title: string;
+  index: number;
+}) {
+  const [data, setData] = useState<File[]>([]);
   const router = useRouter();
+
   useEffect(() => {
     if (props) {
-      setData([...props]);
+      setData([...props.assets]);
     }
   }, []);
+
+  const borders = {
+    borderTopLeftRadius: 20,
+    borderBottomLeftRadius: 20,
+    borderTopRightRadius: index % 2 !== 0 ? 0 : 20,
+    borderBottomRightRadius: index % 2 === 0 ? 0 : 20,
+  };
 
   return (
     <TouchableOpacity
@@ -29,19 +57,31 @@ export default function FolderCard({ props, title }: { props: FolderCardData[]; 
         style={{
           flex: 1,
           height: 160,
-          borderRadius: 16,
           marginHorizontal: 8,
-          marginBottom: 40,
+          marginBottom: 12,
+          ...borders,
         }}>
         {data && data.length > 0 && (
-          <Image
+          <ImageBackground
             source={{ uri: data[0].uri }}
-            style={{ width: '100%', height: '100%', borderRadius: 16 }}
-          />
+            style={{ width: '100%', height: '100%' }}
+            imageStyle={borders}>
+            <View
+              style={{
+                height: '100%',
+                width: '100%',
+                position: 'absolute',
+                backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                ...borders
+              }}></View>
+          </ImageBackground>
         )}
-        <Text color={'black'} numberOfLines={1} mt={4}>
-          {title}
-        </Text>
+        <View style={{ position: 'absolute', bottom: 24, left: 20 }}>
+          <H6 color={'white'} numberOfLines={2} fontWeight={'700'}>
+            {title}
+          </H6>
+          <Text color={'white'}>{props.total} items</Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
