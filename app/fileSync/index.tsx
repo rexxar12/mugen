@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TouchableOpacity, FlatList, View, Text } from 'react-native';
+import { TouchableOpacity, FlatList, View } from 'react-native';
 import { Link, Stack } from 'expo-router';
 import * as MediaLibrary from 'expo-media-library';
 import FolderCard from '../../components/FolderCard';
@@ -7,9 +7,9 @@ import { insertAlbumInfo } from '~/sqlite/sqlite.config';
 import { MaterialIcons } from '@expo/vector-icons';
 import initDb from '~/utils/initDb';
 import { RegisterBackgroundUpload, handleUpload } from '~/utils/backgroundServices';
-import { cn } from '~/lib/utils';
-import { Sun } from '~/components/Icons';
 
+import { RefreshCcw, ScanLine } from '~/components/Icons';
+import { Text } from '~/components/ui/text';
 export interface MediaAlbums {
   [key: string]: { assets: any[]; total: number };
 }
@@ -69,18 +69,19 @@ const FileSync = () => {
     );
 
   return (
-    <View style={{ flex: 1 }}>
+    <View className='flex-1 mt-4'>
       <Stack.Screen
         options={{
-          title: 'FileSync',
+          title: 'Albums',
           headerRight: () => {
             return (
               <View style={{ flexDirection: 'row' }}>
-                    <Sun className='text-foreground' size={23} strokeWidth={1.25} color="red"/>
-                <Link href="/RetrieveRemoteIP/" style={{ marginRight: 20 }}>
+                <Link href="/RetrieveRemoteIP/" style={{ marginRight: 24 }}>
+                  <ScanLine className="text-foreground" size={20} strokeWidth={1.25} />
                 </Link>
+
                 <TouchableOpacity onPress={async () => await handleUpload()}>
-                  <MaterialIcons name="refresh" size={24} />
+                  <RefreshCcw className="text-foreground" size={20} strokeWidth={1.25} />
                 </TouchableOpacity>
               </View>
             );

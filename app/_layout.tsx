@@ -5,7 +5,7 @@ import { Theme, ThemeProvider } from '@react-navigation/native';
 import { SplashScreen, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as React from 'react';
-import { Platform } from 'react-native';
+
 import { NAV_THEME } from '~/lib/constants';
 import { useColorScheme } from '~/lib/useColorScheme';
 
@@ -39,7 +39,7 @@ export default function RootLayout() {
         setIsColorSchemeLoaded(true);
         return;
       }
-      AsyncStorage.setItem('theme', 'dark');
+      AsyncStorage.setItem('theme', 'light');
       const colorTheme = theme === 'dark' ? 'dark' : 'light';
       if (colorTheme !== colorScheme) {
         setColorScheme('dark');

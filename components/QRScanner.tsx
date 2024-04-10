@@ -48,7 +48,7 @@ export default function QRScanner() {
           barcodeTypes: ['qr', 'pdf417'],
         }}
         style={[StyleSheet.absoluteFillObject, { justifyContent: 'center', alignItems: 'center' }]}>
-        <View style={{flex: 1}}>
+        <View className="">
           <Image
             source={require('../assets/images/qr_overlay.png')}
             style={{ height: 270, width: 289 }}
