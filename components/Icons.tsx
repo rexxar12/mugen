@@ -1,4 +1,4 @@
-import { AlertCircle, CheckCircle, LucideIcon, XCircle } from 'lucide-react-native';
+import { Info, LucideIcon, MoonStar, Sun } from 'lucide-react-native';
 import { cssInterop } from 'nativewind';
 
 function interopIcon(icon: LucideIcon) {
@@ -13,8 +13,8 @@ function interopIcon(icon: LucideIcon) {
   });
 }
 
-interopIcon(AlertCircle);
-interopIcon(CheckCircle);
-interopIcon(XCircle);
+interopIcon(Info);
+interopIcon(MoonStar);
+interopIcon(Sun);
 
-export { AlertCircle, CheckCircle, XCircle };
+export { Info, MoonStar, Sun };

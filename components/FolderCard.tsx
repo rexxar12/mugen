@@ -75,7 +75,7 @@ export default function FolderCard({
               }}></View>
           </ImageBackground>
         )}
-        <View style={{ position: 'absolute', bottom: 24, left: 20 }}>
+        <View className='absolute bottom-8 left-8'>
           <Text style={{ color: 'white', fontWeight: '700' }} numberOfLines={2}>
             {title}
           </Text>

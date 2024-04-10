@@ -7,6 +7,8 @@ import { insertAlbumInfo } from '~/sqlite/sqlite.config';
 import { MaterialIcons } from '@expo/vector-icons';
 import initDb from '~/utils/initDb';
 import { RegisterBackgroundUpload, handleUpload } from '~/utils/backgroundServices';
+import { cn } from '~/lib/utils';
+import { Sun } from '~/components/Icons';
 
 export interface MediaAlbums {
   [key: string]: { assets: any[]; total: number };
@@ -74,8 +76,8 @@ const FileSync = () => {
           headerRight: () => {
             return (
               <View style={{ flexDirection: 'row' }}>
+                    <Sun className='text-foreground' size={23} strokeWidth={1.25} color="red"/>
                 <Link href="/RetrieveRemoteIP/" style={{ marginRight: 20 }}>
-                  <MaterialIcons name="qr-code-scanner" size={24} />
                 </Link>
                 <TouchableOpacity onPress={async () => await handleUpload()}>
                   <MaterialIcons name="refresh" size={24} />
@@ -85,7 +87,7 @@ const FileSync = () => {
           },
         }}
       />
-      <View style={{ flex: 1, marginTop: 12 }}>
+      <View>
         <FlatList
           data={Object.keys(mediaAlbums)}
           numColumns={1}
