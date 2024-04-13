@@ -1,4 +1,4 @@
-import { LucideIcon, ScanLine, RefreshCcw } from 'lucide-react-native';
+import { LucideIcon, ScanLine, RefreshCcw, Check } from 'lucide-react-native';
 import { cssInterop } from 'nativewind';
 
 function interopIcon(icon: LucideIcon) {
@@ -15,5 +15,5 @@ function interopIcon(icon: LucideIcon) {
 
 interopIcon(ScanLine);
 interopIcon(RefreshCcw);
-
-export { ScanLine, RefreshCcw };
+interopIcon(Check);
+export { ScanLine, RefreshCcw, Check };

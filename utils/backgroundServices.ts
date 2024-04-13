@@ -30,6 +30,7 @@ export const handleUpload = async () => {
       console.log('Files uploaded successfully');
     }
   });
+  await handleUpload();
 };
 
 TaskManager.defineTask(BACKGROUND_UPLOAD, handleUpload);
