@@ -4,6 +4,7 @@ import { Stack, useLocalSearchParams } from 'expo-router';
 import * as MediaLibrary from 'expo-media-library';
 import ImageView from 'react-native-image-viewing';
 import { FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
+import { RefreshCcw, X } from '~/components/Icons';
 import initDatabase, {
   getMarkedForSync,
   insertFiles,
@@ -137,7 +138,6 @@ export default function ImageList() {
     });
   }, [title, isSyncing]);
 
-
   const HeaderRight = useMemo(() => {
     if (!isSelectorActive) return null;
     return (
@@ -148,11 +148,10 @@ export default function ImageList() {
             await unmarkSyncItem(db, selectedItems).then(() => {
               setIsSyncing(true);
               setSelectedItems(new Set());
-              console.log('Synced');
               setIsSelectorActive(false);
             });
           }}>
-          <FontAwesome6 name="xmark" size={20} />
+          <X className="text-foreground" />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={async () => {
@@ -165,11 +164,12 @@ export default function ImageList() {
               setIsSelectorActive(false);
             });
           }}>
-          <FontAwesome5 name="sync" size={16} />
+          <RefreshCcw className="text-foreground" />
         </TouchableOpacity>
       </View>
     );
   }, [isSelectorActive, selectedItems, mediaItems, title]);
+
   return (
     <View style={{ flex: 1 }}>
       <Stack.Screen

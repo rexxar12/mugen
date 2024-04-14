@@ -35,11 +35,11 @@ export default function RootLayout() {
       const theme = await AsyncStorage.getItem('theme');
 
       if (!theme) {
-        AsyncStorage.setItem('theme', colorScheme);
+        AsyncStorage.setItem('theme', 'dark');
         setIsColorSchemeLoaded(true);
         return;
       }
-      AsyncStorage.setItem('theme', 'light');
+      AsyncStorage.setItem('theme', 'dark');
       const colorTheme = theme === 'dark' ? 'dark' : 'light';
       if (colorTheme !== colorScheme) {
         setColorScheme('dark');
@@ -58,8 +58,8 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-      <StatusBar style={isDarkColorScheme ? 'light' : 'dark'} />
+    <ThemeProvider value={DARK_THEME}>
+      <StatusBar style={'dark'} />
       <Stack />
     </ThemeProvider>
   );
