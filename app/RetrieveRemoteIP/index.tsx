@@ -6,6 +6,7 @@ import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
 import { useIPStore } from '~/state/ipStore';
 import { Check } from '~/components/Icons';
+import { Button } from '~/components/ui/button';
 
 export default function GetIP() {
   const [inputIP, setInputIP] = useState<string>('');
@@ -40,6 +41,9 @@ export default function GetIP() {
             className="flex-1 mx-5"
             onChangeText={(text) => setInputIP(text)}
           />
+          <Button onPress={handleIPSet} className="p-2 rounded-lg mr-2" variant='outline'>
+            <Check className="text-foreground" size={20} strokeWidth={1.25} />
+          </Button>
         </View>
       </View>
       <QRScanner />
